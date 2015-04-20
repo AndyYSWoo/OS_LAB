@@ -1,0 +1,68 @@
+\documentclass[a4paper]{article}
+
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage[colorlinks,linkcolor=blue]{hyperref}
+\usepackage[colorinlistoftodos]{todonotes}
+\usepackage[noindent]{ctex}
+\usepackage{amsmath}
+\usepackage{lipsum}
+\usepackage{color}
+
+
+\title{\Huge \heiti{操作系统实验（三）}}
+
+\author{\lishu{南京大学软件学院}}
+
+\date{\normalsize 2015.5}
+\begin{document}
+\maketitle
+
+\renewcommand{\abstractname}{实验重点}
+
+\begin{abstract}
+本次作业重点：操作系统的中断与异常，IO操作以及机制，实模式和保护模式下的中断异同。
+\end{abstract}
+
+\section{实验内容}
+\subsection{编写OS层次的IO程序}
+~~~~~~参考《Orange's》，在之前搭建的$nasm+bochs$实验平台上完成一个接受键盘输入，回显到屏幕上的程序，具体要求如下：
+	\begin{itemize}
+		\item 从屏幕左上角开始，显示键盘输入的字符。可以输入并显示a-z和0-9字符。
+		\item 支持大小写，包括Shift 组合键以及大写锁定两种方式。
+		\item 支持回车键换行。
+		\item 支持删除退格，退格如果退回上一行，必须退回该行编辑的最后一个字符处。
+		\item 支持空格键和Tab键，其中对于Tab键如果实现其作为制表符（即使用了Tab的位置
+		输入退格时会退四格），将会得到加分。
+		\item 每隔 20秒左右,清空屏幕。输入的字符重新从屏幕左上角开始显示。
+		\item 若按下 F1 到 F5,分别切换到不同颜色进行输出。
+		\item 要求有光标显示,固定光标或者闪烁光标均可,但一定要跟随输入字符的位置变化。
+		\item 要求支持一种特殊的组合键，规则为当同时按下Shift和Tab键的情况下，输入键盘上的
+		Q, A, Z, W, S, X键时，显示的内容是其右边一个键的内容，即对应显示W, S, X, E, D, C。对其他键不做要求。
+		\item 使用make构建整个项目，程序必须\underline{\youyuan{进入到保护模式下完成}}。
+		\item 提交代码（包含makefile)和运行截图，其中makefile必须支持make run命令。
+	\end{itemize}
+\subsection{注意事项}
+	\begin{itemize}
+		\item 要求使用make命令可以完成编译汇编到生成所需的 bin 文件。
+		\item 完成此次实验，你可能要仔细阅读《Orange’s》的第3.4 节, 5.5 节, 7.1 到 7.3 节。
+		\item 对于 boot.bin 和 loader.bin,你可以直接使用《Orange’s》的代码,即本次作业可以直接在光盘中第 5 章的相关源代码上面修改。这些代码已经组织好了 包括 boot.bin,loader.bin 和 kernel.bin 的结构。如果你不想用这个模式,可 以从头自己写代码,只需在检查作业时跟助教说明一下。
+		\item 如果你是在Orange's里的代码基础上修改的，检查作业时需要说明自己改动的地方。
+	\end{itemize}
+
+\section{问题清单}
+~~~~~~在整个实验的过程中，无论是编程还是查资料，请各位同学注意思考以下问题，助教检查时会从中随机抽取数个题目进行提问，根据现场作答给出分数。
+\underline{请注意，我们鼓励自己思考和动手实验}，如果
+能够提供自己的思考结果并辅助以相应的实验结果进行说明，在分数评定上会酌情考虑。
+
+
+\section{参考资料}
+	\begin{enumerate}
+		\item 《Orange'S:一个操作系统的实现》
+		\item \href{http://www.nasm.us/doc/} {NASM doc}
+		\item \href{http://jingliu.me/my_files/nasm.pdf}{Introduction to NASM}
+	\end{enumerate}
+
+\end{document}
