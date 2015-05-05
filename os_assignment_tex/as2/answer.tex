@@ -1,0 +1,134 @@
+\documentclass[a4paper]{article}
+
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage[colorlinks,linkcolor=blue]{hyperref}
+\usepackage[colorinlistoftodos]{todonotes}
+\usepackage[noindent]{ctex}
+\usepackage{amsmath}
+\usepackage{lipsum}
+\usepackage{color}
+
+
+\title{\Huge \heiti{操作系统实验（二）问答题参考}}
+
+\author{\lishu{南京大学软件学院}}
+
+\date{\normalsize 2015.5}
+\begin{document}
+\maketitle
+
+\renewcommand{\abstractname}{实验重点}
+
+\begin{abstract}
+本次作业重点：熟悉掌握Fat12文件系统，$gcc+nasm$联合编译实践以及了解实模式与保护模式的基本内容。
+\end{abstract}
+
+\section{问题清单}
+~~~~~~在整个实验的过程中，无论是编程还是查资料，请各位同学注意思考以下问题，助教检查时会从中随机抽取数个题目进行提问，根据现场作答给出分数。
+\underline{请注意，我们鼓励自己思考和动手实验}，如果
+能够提供自己的思考结果并辅助以相应的实验结果进行说明，在分数评定上会酌情考虑。
+
+\subsection{PPT相关内容}
+\begin{enumerate}
+	\item 实模式下的寻址方式以及实模式的缺陷
+	
+	寻址方式：实模式下，段在内存中固定的位置（物理地址 = 段值*16 + 偏移 ）；
+	
+	缺陷：通过改变段寄存器的值，我们可以随心所欲的访问内存任何一个单元，而丝毫不受到限制，不能对内存访问加以限制，也就谈不上对系统的保护；内存中每个字节的地址能由不止一个的段基址加偏移表示，比如04808能够由047C:0048,047D:0038,047E:0028 or 047B:0058表示，分段地址之间的比较将复杂化。
+	
+	\item 保护模式下的寻址过程：
+	\begin{itemize}
+		\item 段寄存器中存储的是什么?GDT 是什么?LDT 是什么?如何区分 LDT 和 GDT? LDT 和 GDT 的区别是什么?如何定位到 Descriptor?Descriptor 的内容有哪些?
+		\begin{itemize}
+			\item 存储的是选择子，即描述符在描述符表中的位置
+			\item GDT是全局描述符表；LDT是局部描述符表
+			\item 存储的是选择子，即描述符在描述符表中的位置
+			\item GDT是全局描述符表；LDT是局部描述符表
+			\item 根据选择子中的第三位决定是GDT还是LDT区分
+			\item DT(Local)与GDT相同，但是不是全局的，对于某个进程，它只知道它自己的LDT。每个进程有自己的LDT，访问自己的段时从LDT查询。进程从LDTR寄存器中获得LDT的位置，向它发起查询
+			\item 如果是GDT，则根据GDTR和段寄存器中的内容定位到描述符
+			\item 如果是LDT，则根据LDTR中的内容（选择子）和GDTR中的内容定位到描述符
+			\item Descriptor中的内容包括是否在内存中，段的起始地址、界限、属性等内容
+			\item GDTR中内容是全局描述符表的位置；LDTR中存储选择子，用于定位GDT中的某个LDT描述符，得到LDT的地址
+			\item LDT存放在GDT中的原因是GDT表只有一个，是固定的
+			\item 而LDT表每个任务就可以有一个，因此有多个，并且由于任务的个数在不断变化其数量也在不断变化
+		\end{itemize}
+		\item GDTR 中的内容是什么?LDTR 中存储的是什么?为什么 LDT 要放在 GDT 中?
+		\begin{itemize}
+			\item 全局描述符表的位置
+			\item 选择子，用于定位GDT中的某个LDT描述符，得到LDT的地址
+			\item GDT表只有一个，是固定的；而LDT表每个任务就可以有一个，因此有多个，并且由于任务的个数在不断变化其数量也在不断变化。如果只有一个LDTR寄存器显然不能满足多个LDT的要求。
+		\end{itemize}
+	\end{itemize}
+	
+	\item 选择子的作用：
+		\begin{itemize}
+			\item 选择子是什么？它的值存放在哪里？
+			
+			描述符在描述符表中的相对偏移，值存放在段寄存器里。
+			\item 选择子里面的内容有哪些？
+			
+			选择子是一个2字节的数，共16位，最低2位表示RPL（请求特权等级），第3位表示查表是利用GDT（全局描述符表）还是LDT（局部描述符表）进行，最高13位给出了 所需的描述符在描述符表中的地址.
+			\item 为什么偏移地址大小是13位？
+			
+			GDTR是一个48位的寄存器，其中32位表示段地址，16位表示段限（最大 64K，每个描述符8字节，故最多有64K/8=8K个描述符）
+13位正好足够寻址8K项。
+		\end{itemize}
+	\item 描述符的作用：
+	
+	描述一个段是否在内存中，段的起始地址、界限、属性等内容
+	\item GDTR/LDTR 的作用：
+		\begin{itemize}
+			\item GDTR的内容是什么？
+			
+			全局描述符表的位置
+			\item LDTR的内容是什么？
+			
+			LDT的描述符在GDT中的相对偏移，根据GDTR中的内容即可得到LDT的描述符
+		\end{itemize}
+	\item 根目录区大小一定么?扇区号是多少?为什么？
+	
+	不一定  19  1(引导扇区)+9(FAT1)+9(FAT2) =19
+	\item 数据区第一个簇号是多少?为什么?
+	
+	第一个簇号为2，在1.44M软盘上，FAT前三个字节的值必须是固定的，分别是0xF0、0xFF、0xFF，用于表示这是一个应用在1.44M软盘上的FAT12文件系统。本来序号为0和1的FAT表项应该对应于簇0和簇1，但是由于这两个表项被设置成了固定值，簇0和簇1就没有存在的意义了，所以数据区就起始于簇2。
+	\item FAT 表的作用?
+	
+	记录硬盘中有关文件如何被分散存储在不同扇区的信息（也可以回答为了找到所有的簇(扇区)）
+	\item 解释静态链接的过程。
+	
+	相似段合并；重定位。	
+	\item 解释动态链接的过程。
+	
+	动态链接器自举；装载共享对象 ；重定位和初始化 
+	\item 静态链接相关PPT中为什么使用ld链接而不是gcc。
+	
+	使用ld进行连接的原因是为了避免gcc进行glibc的链接
+	\item linux下可执行文件的虚拟地址空间默认从哪里开始分配。
+	
+	linux下可执行文件的虚拟空间地址默认从0x08048000开始分配
+\end{enumerate}
+
+\subsection{实验相关内容}
+\begin{enumerate}
+	\item BPB 指定字段的含义
+	\item 如何进入子目录并输出(说明方法调用)
+	\item 如何获得指定文件的内容,即如何获得数据区的内容(比如使用指针等)
+	\item 如何进行 C 代码和汇编之间的参数传递和返回值传递
+	\item 汇编代码中对 I/O 的处理方式,说明指定寄存器所存值的含义
+	\item 可以要求解释某些看不懂的代码(我看不懂的话,你得讲给我听)
+\end{enumerate}
+
+\section{参考资料}
+	\begin{enumerate}
+		\item 《Orange'S:一个操作系统的实现
+		\item \href{http://jingliu.me/my_files/nasm.pdf}{Introduction to NASM}
+		\item \href{http://www.eit.lth.se/fileadmin/eit/courses/eitn50/Projekt1/FAT12Description.pdf}
+		{An overview of FAT12}
+		\item \href{http://www.iecc.com/linker/linker10.html}{Dynamic Linking and Loading}
+	\end{enumerate}
+
+\end{document}
