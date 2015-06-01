@@ -1,0 +1,82 @@
+\documentclass[a4paper]{article}
+
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage[colorlinks,linkcolor=blue]{hyperref}
+\usepackage[colorinlistoftodos]{todonotes}
+\usepackage[noindent]{ctex}
+\usepackage{amsmath}
+\usepackage{lipsum}
+\usepackage{color}
+
+
+\title{\Huge \heiti{操作系统实验（四）}}
+
+\author{\lishu{南京大学软件学院}}
+
+\date{\normalsize 2015.5}
+\begin{document}
+\maketitle
+
+\renewcommand{\abstractname}{实验重点}
+
+\begin{abstract}
+本次作业重点：操作系统的进程，系统调用，PV操作以及进程调度的实现。
+\end{abstract}
+
+\section{实验内容}
+\subsection{实现进程调度}
+~~~~~~参考《Orange's》，在之前搭建的$nasm+bochs$实验平台上实现特定进程调度问题的模拟，具体要求如下。
+	\begin{itemize}
+		\item 添加一个系统调用~sys\_process\_sleep，其功能是接受一个int型参数
+mill\_seconds，调用此System Call的进程会在mill\_seconds毫秒内不被进程调度函数分
+配时间片。
+		\item 添加一个系统调用~sys\_disp\_str,其功能接受一个char* str参数,打印
+出字符串。
+		\item 添加两个系统调用,sys\_sem\_p和sys\_sem\_v,即信号量的PV操作,在此基础上模
+拟睡眠的理发师问题。
+		
+		\item 共有五个进程，A进程普通进程，B进程是理发师，C进程是顾客，D进程是顾客，E进程是顾客。要求有一把理发椅，并支持等待椅子的数目分别为1、2、3（必须都能够支持，并且可以现场修改，助教检查时在其中随机选择数目），开始时理发师处于沉睡状态。理发师理发消耗两个时间片。
+		\item 普通进程、理发师进程和顾客进程用不同颜色打印，其中顾客要打印递增的顾客ID，并打印基本操作比如理发师剪发，顾客得到服务，顾客到来并等待，顾客离开等。
+		
+	\end{itemize}
+\subsection{注意事项}
+	\begin{itemize}
+		\item 第六章代码已经有sys\_get\_ticks系统调用和基于此的mills\_delay函数,似
+乎已经有了sleep的功能可以把进程延迟,但它本质上还是给予分配了时间 片的,只不过在分配的时间片里在mills\_delay函数中什么也没做。我们的 sys\_process\_sleep是不分配时间片的。你可能有疑惑要是所有进程都 sleep了时间片给谁了?这确实是个问题,如果四个进程都调用的sleep,在 目前《Orange’S》的代码上要完美解决可能的改动很大,有难度,所以我 们规定\underline{A进程是不调用sleep的(相当于不可以被sleep 的系统进程),} \\ \underline{检查 作业时不会要求A进程调用sleep}。
+		\item 第六章的代码已经在kliba.asm文件中有了disp\_str函数显示字符串,但注 意这是内核函数,写在main.c中的testA,testB,testC能够调用只是因为它
+们虽然是用户进程但仍然写死在了内核中。所以本次实验要求加入一个系统 调用，\underline{通过系统调用模式打印字符串}。
+		\item 在阅读源代码时可能需要经常:
+		\begin{enumerate}
+			\item 查看某段代码第一次在教材中出现的地方。
+			\item 使用grep命令查找某个函数或变量在哪儿定义和哪儿 使用到了。比如grep –r “some\_function”,其中‐r 表示递归查找所有 文件，会有很详细的解释。
+		\end{enumerate}
+		\item 请在TSS上面提交你的实验代码，并提交一个以你学号命名的pdf文档，在其中说明你改动的部分和思路，并将各个椅子数目下的实验结果截图插入其中。
+		\item 按照往年经验，此次实验完全自己完成的同学（指\textbf{只参考了Orange's书，没有参考任何学长学姐代码，没有参考任何同学代码，没有参考任何相同作业的资料}），可以选择在TSS上的加分项目里提交你的所有源代码（必须支持可以make run显示结果）以及一个以你学号命名的pdf文档，文档中只需要\textbf{概括叙述}为了完成实验，需要参考oranges一书中的哪些内容（具体到每一个小节），可选的包括实验中遇到的困难和解决方案。这部分同学，\textbf{必须}在特定的助教面前检查，并应对一切可能的问题和最高的标准，一旦被认可并且通过复核，将获得最高2倍的分数。即使不认可，也不能在其他助教处检查作业，以最高标准下的评分为准。
+	\end{itemize}
+
+\section{问题清单}
+~~~~~~在整个实验的过程中，无论是编程还是查资料，请各位同学注意思考以下问题，助教检查时会从中随机抽取数个题目进行提问，根据现场作答给出分数。
+\underline{请注意，我们鼓励自己思考和动手实验}，如果
+能够提供自己的思考结果并辅助以相应的实验结果进行说明，在分数评定上会酌情考虑。
+
+\begin{enumerate}
+	\item 进程是什么？
+	\item 进程表是什么？
+	\item 进程栈是什么？
+	\item 当寄存器的值已经被保存到进程表内，esp应指向何处来避免破坏进程表的值？
+	\item tty是什么？
+	\item 不同的tty为什么输出输出不同的画面在同一个显示器上？
+	\item 解释tty任务执行过程？
+	\item tty结构体中大致包含哪些内容？
+	\item console结构体中大致包含哪些内容？
+\end{enumerate}
+
+\section{参考资料}
+	\begin{enumerate}
+		\item 《Orange'S:一个操作系统的实现》
+	\end{enumerate}
+
+\end{document}
