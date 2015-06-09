@@ -10,37 +10,7 @@ D. 8. DS, IP
 难度：难
 
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-2. 对于以下代码片段，不正确的是()
-
-LABEL_FILE_LOADED:
-	call killMotor	;关闭软驱马达
-
-	;加载GDTR
-	lgdt	[GdtPtr]
-
-	;关中断
-	cli
-
-	;打开地址线A20
-	in		al, 92h
-	or		al, 00000010h
-	out		92h, al
-
-	;切换
-	mov		eax, cr0
-	or		eax, 1
-	mov		cr0, eax
-
-	;跳转 SelectorFlatC是GDT选择子
-	jmp		dword SelectorFlatC:(BaseOfLoader*10h+LABEL_PM_START)
-	
-
-A. dword指定的是32位数据类型—————@修改
-B. 此代码片段的作用是Loader进入实模式
-C. BaseOfLoader*10h+LABEL_PM_START是为了计算loader中出现的标号变量的物理地址
-D. GDTR是全局描述符寄存器
-
+2. 于以下代码片段（取自oranges一书），不正确的是（）LABEL_FILE_LOADED:	call killMotor	;关闭软驱马达	;加载GDTR	lgdt	[GdtPtr]	;关中断	cli	;打开地址线A20	in		al, 92h	or		al, 00000010h	out		92h, al	;切换	mov		eax, cr0	or		eax, 1	mov		cr0, eax	;跳转 SelectorFlatC是GDT选择子	jmp		dword SelectorFlatC:(BaseOfLoader*10h+LABEL_PM_START)a)	dword指定的是32位数据类型b)	此代码片段的作用是Loader进入实模式c)	BaseOfLoader*10h+LABEL_PM_START是为了计算loader中出现的标号变量的物理地址d)	GDTR是全局描述符寄存器
 正确答案：B（进入保护模式）
 难度：难
 
